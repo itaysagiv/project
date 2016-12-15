@@ -34,7 +34,7 @@ cache: $(OBJS) $(USER_OBJS)
 
 # Other Targets
 clean:
-	-$(RM) $(OBJS)$(C_DEPS)$(EXECUTABLES) cache
+	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) cache
 	-@echo ' '
 
 .PHONY: all clean dependents
