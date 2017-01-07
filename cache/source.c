@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#define MISS_TIME_TH 50 //nano sec
+//#define MISS_TIME_TH 50 //nano sec
 #define MALLOC_SIZE 100000
 #define BUFF_SIZE 128
 
@@ -18,16 +18,19 @@ int cache_line_len;//Bytes
 int num_of_sets;
 int lines_in_set;
 int cache_size;//Bytes
+int MISS_TIME_TH;
 
 int isInCache(char*);
 int command(const char* str);
 
-int main()
+int main(int argc, char** argv)
 {
 
-	int i,j,set_size;
-	char** perm;
+	int i,j;
 	char* arr;
+	int index_mask = 0x3FFC0;
+
+	MISS_TIME_TH = atoi(argv[1]);
 
 	//getting machine cache parameters
 	cache_line_len = command("cat //sys//devices//system//cpu//cpu0//cache//index3//coherency_line_size ");
@@ -48,22 +51,18 @@ int main()
 	i=0;
 	//add first at least a set-size amount of entries before start checking
 	//keep inserting until the first entry misses
-	while((isInCache(arr) && i<MALLOC_SIZE) || i<lines_in_set)
+	while((isInCache(arr) && i<MALLOC_SIZE) || i<=lines_in_set+1)
 	{
-		//for(j=0;j<i;j++)
 		arr[i*cache_line_len]++;
 		i++;
 	}
 
-	printf("miss after %d\n",i);
-
-
-	set_size = i;
-	//while(set_size > 12)
+	for(j=0;j<i;j++)
 	{
-
+		printf("index= %#x\n",(((int)(arr+j))&index_mask)>>6);
 	}
 
+	printf("miss after %d hits\n",i);
 	free(arr);
 	return 0;
 }
