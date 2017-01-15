@@ -28,9 +28,9 @@ int main(int argc, char** argv)
 
 	int i,j;
 	char* arr;
-	int index_mask;
+	int index_mask = 0x3FFC0;//isolating the index 12 bits
 
-	MISS_TIME_TH = atoi(argv[1]);
+	MISS_TIME_TH = 30;//atoi(argv[1]);
 
 	//getting machine cache parameters
 	cache_line_len = command("cat //sys//devices//system//cpu//cpu0//cache//index3//coherency_line_size");
@@ -40,8 +40,6 @@ int main(int argc, char** argv)
 	lines_in_set = cache_size/(num_of_sets*cache_line_len);
 
 	arr=malloc(cache_size*cache_line_len);
-
-	index_mask = (num_of_sets-1)*cache_line_len;//isolating the index bits
 
 	//put the address of the next line into the previews line to avoid the cache optimizing
 	for(i=0;i<cache_size;i++)
